@@ -22,7 +22,7 @@ export default function EntranceScreen() {
     if (!code) return;
     let alive = true;
     import('qrcode')
-      .then((QR) => QR.toDataURL(QR_PREFIX + code, { margin: 1, width: 360, errorCorrectionLevel: 'M', color: { dark: '#10251e', light: '#ffffff' } }))
+      .then((QR) => QR.toDataURL(QR_PREFIX + code, { margin: 1, width: 360, errorCorrectionLevel: 'M', color: { dark: '#1e3a32', light: '#ffffff' } }))
       .then((url) => alive && setQr(url))
       .catch(() => alive && setQr(null));
     return () => { alive = false; };
@@ -45,7 +45,7 @@ export default function EntranceScreen() {
       <div className="screen stack" ref={box} style={{ gap: 24 }}>
         <div className="row between" style={{ flexWrap: 'wrap', gap: 12 }}>
           <div>
-            <div className="muted small bold" style={{ textTransform: 'uppercase', letterSpacing: '0.1em' }}>{data.unitName}</div>
+            <div className="muted small bold">{data.unitName}</div>
             <div style={{ fontSize: 28, fontWeight: 800 }}>
               {data.meal ? `${data.meal.label} · ${data.meal.start}–${data.meal.end}` : 'No meal being served'}
             </div>

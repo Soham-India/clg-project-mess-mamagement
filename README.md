@@ -209,7 +209,7 @@ Buying (order + all its coupons) and transferring (move coupon + log it) each ru
 
 ```
 app/
-  login/page.js              login with demo buttons
+  login/page.js              landing + login: hero, how it works, demo buttons, meal-time footer
   (app)/layout.js            shared shell (sidebar / bottom nav)
   (app)/home, menu, coupons, coupons/review, coupons/wallet, checkin, complaints
   (app)/staff/screen, staff/counter, staff/headcount, staff/menu

@@ -149,15 +149,83 @@ export function Toasts() {
 export function Logo({ size = 34 }) {
   return (
     <svg width={size} height={size} viewBox="0 0 40 40" aria-hidden="true">
-      <circle cx="20" cy="20" r="19" fill="#1f5c4a" />
-      <circle cx="20" cy="20" r="14.5" fill="none" stroke="#f6f3ec" strokeWidth="1.5" opacity="0.6" />
-      <circle cx="14.5" cy="15.5" r="4.2" fill="#d99a1e" />
-      <circle cx="25.5" cy="15.5" r="4.2" fill="#f6f3ec" />
-      <circle cx="20" cy="25.5" r="5" fill="#e9b85a" />
+      <circle cx="20" cy="20" r="19" fill="#d4573a" />
+      <circle cx="20" cy="20" r="14.5" fill="none" stroke="#f5e8cc" strokeWidth="1.5" opacity="0.7" />
+      <circle cx="14.5" cy="15.5" r="4.2" fill="#f2b632" />
+      <circle cx="25.5" cy="15.5" r="4.2" fill="#f5e8cc" />
+      <circle cx="20" cy="25.5" r="5" fill="#2e5a4c" />
     </svg>
   );
 }
 
+// Fixed (not random) positions so server and browser render the same picture.
+const RICE = [
+  [118, 236, 20], [132, 228, -30], [146, 222, 10], [162, 226, 60], [176, 236, -15], [124, 252, 45],
+  [140, 246, -5], [156, 242, 30], [172, 252, -40], [190, 254, 15], [116, 268, -20], [132, 266, 70],
+  [148, 262, 0], [164, 268, 35], [182, 270, -25], [128, 284, 10], [146, 282, -50], [162, 286, 20],
+  [178, 284, -10], [140, 296, 40], [158, 298, -30], [196, 238, 50], [110, 252, -60],
+];
+const SALT = [[96, 92], [310, 256], [284, 312], [92, 300], [330, 150], [214, 344], [74, 186], [242, 60], [318, 214], [120, 330]];
+const KATORIS = [
+  { cx: 136, cy: 126, r: 46, fill: '#e9ad2c', top: '#f4c656' }, // dal
+  { cx: 238, cy: 102, r: 42, fill: '#c6492c', top: '#de6a45' }, // sabzi
+  { cx: 302, cy: 182, r: 38, fill: '#efe5cf', top: '#fbf4e4' }, // raita
+];
+
+/** Illustrated steel thali on a banana leaf: dal, sabzi, raita, rice and roti. */
+export function ThaliPlate({ size = 440, label = 'A thali with dal, sabzi, raita, rice and roti' }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 400 400" {...(label ? { role: 'img', 'aria-label': label } : { 'aria-hidden': true })}>
+      <path d="M24 352 C 120 150 250 40 392 18 C 360 170 230 300 24 352 Z" fill="#4c8a4a" />
+      <path d="M24 352 C 150 250 280 120 392 18" stroke="#3a6e3a" strokeWidth="3" fill="none" />
+      <circle cx="200" cy="206" r="178" fill="#13241f" opacity="0.35" />
+      <circle cx="200" cy="198" r="178" fill="#56685f" />
+      <circle cx="200" cy="198" r="164" fill="#3d4d47" />
+      <circle cx="200" cy="198" r="150" fill="#344440" />
+      {SALT.map(([x, y], i) => <circle key={i} cx={x} cy={y} r="1.6" fill="#e9e1cf" opacity="0.7" />)}
+      {KATORIS.map((b, i) => (
+        <g key={i}>
+          <circle cx={b.cx} cy={b.cy + 4} r={b.r} fill="#1d2b27" opacity="0.4" />
+          <circle cx={b.cx} cy={b.cy} r={b.r} fill="#c9d0cb" />
+          <circle cx={b.cx} cy={b.cy} r={b.r - 6} fill={b.fill} />
+          <ellipse cx={b.cx - b.r * 0.22} cy={b.cy - b.r * 0.25} rx={b.r * 0.42} ry={b.r * 0.22} fill={b.top} opacity="0.75" />
+        </g>
+      ))}
+      {[[126, 132], [146, 120], [140, 142], [118, 116]].map(([x, y], i) => <circle key={i} cx={x} cy={y} r="2.6" fill="#7a3b12" />)}
+      {[[226, 110], [250, 96], [242, 118], [292, 176], [312, 190], [300, 168]].map(([x, y], i) => (
+        <ellipse key={i} cx={x} cy={y} rx="4" ry="2.2" fill="#3f8a3c" transform={`rotate(${i * 35} ${x} ${y})`} />
+      ))}
+      <ellipse cx="154" cy="262" rx="66" ry="50" fill="#f7f1e2" />
+      <ellipse cx="146" cy="250" rx="46" ry="28" fill="#fffaf0" />
+      {RICE.map(([x, y, r], i) => (
+        <ellipse key={i} cx={x} cy={y} rx="5" ry="2" fill="#e6dcc4" transform={`rotate(${r} ${x} ${y})`} />
+      ))}
+      <circle cx="264" cy="276" r="54" fill="#c98d4a" />
+      <circle cx="264" cy="272" r="52" fill="#e3b574" />
+      {[[244, 256, 7], [282, 262, 5], [258, 294, 6], [290, 290, 4], [270, 240, 4], [236, 284, 3]].map(([x, y, r], i) => (
+        <ellipse key={i} cx={x} cy={y} rx={r} ry={r * 0.7} fill="#b77937" opacity="0.8" />
+      ))}
+      <path d="M200 200 L 232 196 A 32 32 0 0 1 212 226 Z" fill="#f2d24a" />
+      <path d="M204 204 L 226 201 A 24 24 0 0 1 212 220 Z" fill="#f8e58a" />
+      <path d="M196 330 C 220 322 246 326 268 340" stroke="#3f8a3c" strokeWidth="7" strokeLinecap="round" fill="none" />
+      <path d="M268 340 l 8 -6" stroke="#2d6b2c" strokeWidth="4" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+/** Two dried turmeric-yellow chillies, a small decoration. */
+export function Chillies({ size = 90 }) {
+  return (
+    <svg width={size} height={size * 0.6} viewBox="0 0 100 60" aria-hidden="true">
+      <path d="M10 40 C 30 30 52 30 72 40 C 56 46 30 48 10 40 Z" fill="#e3a72a" />
+      <path d="M72 40 l 10 -5" stroke="#5d7d3a" strokeWidth="4" strokeLinecap="round" />
+      <path d="M28 22 C 44 10 64 10 84 18 C 66 26 44 28 28 22 Z" fill="#cf9220" />
+      <path d="M84 18 l 9 -6" stroke="#5d7d3a" strokeWidth="4" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+/** Flat outline plate, used faintly behind text. */
 export function PlateArt({ size = 320 }) {
   return (
     <svg width={size} height={size} viewBox="0 0 200 200" aria-hidden="true">

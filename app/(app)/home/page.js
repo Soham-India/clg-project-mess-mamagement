@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { Ticket, ScanLine, CheckCircle2, Circle, ArrowRight, MapPin } from 'lucide-react';
 import { useHomeQuery } from '@/store/api';
 import { MEALS } from '@/lib/constants';
-import { Loading, ErrorBox, Countdown, Badge, PlateArt } from '@/components/ui';
+import { Loading, ErrorBox, Countdown, Badge, ThaliPlate } from '@/components/ui';
 
 const fmtDate = (date) => new Date(`${date}T00:00:00Z`).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', timeZone: 'UTC' });
 
@@ -32,10 +32,10 @@ export default function StudentHome() {
         <Link href="/checkin" className="btn btn-primary"><ScanLine size={18} /> Check in</Link>
       </div>
 
-      <section className="hero">
-        <div className="plate"><PlateArt size={280} /></div>
+      <section className="hero torn-bottom">
+        <div className="plate"><ThaliPlate size={230} label="" /></div>
         <div className="eyebrow">
-          {data.serving ? `Now serving · until ${data.serving.end}` : `Next up · ${nextIsTomorrow ? 'tomorrow ' : ''}${data.next.start}`}
+          {data.serving ? `Now serving, until ${data.serving.end}` : `Next up ${nextIsTomorrow ? 'tomorrow ' : ''}at ${data.next.start}`}
         </div>
         <h2>{heroMeal.label}</h2>
         {!nextIsTomorrow && heroItems && <p className="items">{heroItems}</p>}

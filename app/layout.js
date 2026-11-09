@@ -6,7 +6,7 @@ export const metadata = {
   description: 'Mess management for IIIT Bhubaneswar: menus, weekly coupons, check-in and complaints.',
 };
 
-export const viewport = { themeColor: '#1f5c4a', width: 'device-width', initialScale: 1 };
+export const viewport = { themeColor: '#2e5a4c', width: 'device-width', initialScale: 1 };
 
 export default function RootLayout({ children }) {
   return (
@@ -17,7 +17,7 @@ export default function RootLayout({ children }) {
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
         <link
           rel="stylesheet"
-          href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+          href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=JetBrains+Mono:wght@500;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
         />
       </head>
       <body>
