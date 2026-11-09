@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { one, all, getSettings, nowMs } from '@/lib/db';
 import { handler, requireUser, HttpError } from '@/lib/auth';
-import { windowState } from '@/lib/couponRules';
+import { windowState, couponClockFor } from '@/lib/couponRules';
 import { addDays } from '@/lib/clock';
 
 // GET /api/coupons/window -> the buying window (open / grace / closed), the week it is for,
@@ -11,7 +11,7 @@ export const GET = handler(async (request) => {
   if (user.plan !== 'coupon') throw new HttpError(403, 'Coupons are only for students on the coupon plan.');
   const now = await nowMs();
   const { prices, minDays } = await getSettings();
-  const win = windowState(now, prices, minDays);
+  const win = windowState(couponClockFor(user, now), prices, minDays);
 
   const order = await one('SELECT id, total, created_at, payment_ref FROM coupon_orders WHERE student_id = ? AND week_start = ?', [user.id, win.weekStart]);
   const orderItems = order ? await all('SELECT date, meal FROM coupons WHERE order_id = ?', [order.id]) : [];

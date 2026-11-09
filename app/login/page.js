@@ -8,6 +8,7 @@ import { Logo, ThaliPlate, Chillies, ErrorBox } from '@/components/ui';
 
 const DEMOS = [
   { group: 'Students', items: [
+    { email: 'arjun@iiit-bh.demo', name: 'Arjun Das', note: 'Coupon buying demo: window always open, starts fresh at each login' },
     { email: 'aman@iiit-bh.demo', name: 'Aman Verma', note: '3rd yr, coupon plan, boys' },
     { email: 'neha@iiit-bh.demo', name: 'Neha Singh', note: '3rd yr, coupon plan, girls' },
     { email: 'priya@iiit-bh.demo', name: 'Priya Nayak', note: '3rd yr, fixed plan, main mess' },

@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getDb, one, getSettings, nowMs } from '@/lib/db';
 import { handler, requireUser, HttpError } from '@/lib/auth';
-import { windowState, validateOrder, totalOf } from '@/lib/couponRules';
+import { windowState, validateOrder, totalOf, couponClockFor } from '@/lib/couponRules';
 
 // POST /api/coupons/orders  { items: [{ date, meal }] }
 // Every rule is checked HERE on the server, whatever the browser says.
@@ -12,7 +12,7 @@ export const POST = handler(async (request) => {
   const { items } = await request.json().catch(() => ({}));
   const now = await nowMs();
   const { prices, minDays } = await getSettings();
-  const win = windowState(now, prices, minDays);
+  const win = windowState(couponClockFor(user, now), prices, minDays);
   const existing = await one('SELECT id FROM coupon_orders WHERE student_id = ? AND week_start = ?', [user.id, win.weekStart]);
 
   const errors = validateOrder(items, win, { alreadyOrdered: Boolean(existing) });

@@ -105,6 +105,7 @@ Open http://localhost:3000. The database file `local.db` and all demo data are c
 | Login | Who |
 | --- | --- |
 | `aman@iiit-bh.demo` (or roll `B523052`) | Student, 3rd year, coupon plan, Coupon Mess (Boys) |
+| `arjun@iiit-bh.demo` (or roll `B523099`) | Coupon buying demo, Coupon Mess (Boys). For this account only, the coupon window behaves as if it is Saturday 10:00 whenever the real window is closed, so the purchase can be shown on any day. All other coupon rules still apply. Its coupons and orders are cleared at each login. |
 | `vikram@iiit-bh.demo` (`B522033`) | Student, 4th year, coupon plan, Coupon Mess (Boys) |
 | `neha@iiit-bh.demo` (`B523057`) | Student, 3rd year, coupon plan, Coupon Mess (Girls) |
 | `priya@iiit-bh.demo` (`B523011`) | Student, 3rd year, fixed plan, Main Mess (Girls) |

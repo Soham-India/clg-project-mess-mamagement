@@ -59,10 +59,10 @@ export default function AppShell({ children }) {
   const { data, isLoading, error } = useMeQuery();
   const [logout] = useLogoutMutation();
 
-  if (isLoading) return <Loading />;
+  if (isLoading) return <Loading full />;
   if (error || !data) {
     if (typeof window !== 'undefined') router.replace('/login');
-    return <Loading />;
+    return <Loading full />;
   }
   const user = data.user;
   const nav = navFor(user);

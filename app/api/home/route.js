@@ -3,7 +3,7 @@ import { one, all, getSettings, nowMs } from '@/lib/db';
 import { handler, requireUser } from '@/lib/auth';
 import { ist, mondayOf } from '@/lib/clock';
 import { currentMeal, nextMeal } from '@/lib/meals';
-import { windowState } from '@/lib/couponRules';
+import { windowState, couponClockFor } from '@/lib/couponRules';
 import { unitName } from '@/lib/constants';
 
 // GET /api/home -> everything the student home page needs in one call.
@@ -20,7 +20,7 @@ export const GET = handler(async (request) => {
 
   let coupons = null;
   if (user.plan === 'coupon') {
-    const win = windowState(now, prices, minDays);
+    const win = windowState(couponClockFor(user, now), prices, minDays);
     const thisWeek = mondayOf(p.date);
     const today = await all('SELECT meal, status FROM coupons WHERE student_id = ? AND date = ?', [user.id, p.date]);
     const week = await one(

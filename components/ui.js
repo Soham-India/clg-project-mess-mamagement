@@ -17,10 +17,11 @@ export function PageHeader({ title, sub, children }) {
   );
 }
 
-export function Loading() {
+/** Three katoris bouncing in turn. `full` centres it on the whole screen (first page load). */
+export function Loading({ full = false }) {
   return (
-    <div className="loading" role="status" aria-label="Loading">
-      <div className="spinner" />
+    <div className={`loading ${full ? 'loading-full' : ''}`} role="status" aria-label="Loading">
+      <div className="katori-loader" aria-hidden="true"><span /><span /><span /></div>
     </div>
   );
 }
