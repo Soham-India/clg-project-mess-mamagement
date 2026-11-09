@@ -11,6 +11,8 @@ async function resetDemoBuyer(userId) {
   try {
     const mine = 'SELECT id FROM coupons WHERE student_id = ? OR original_student_id = ?';
     await tx.execute({ sql: `DELETE FROM transfers WHERE coupon_id IN (${mine})`, args: [userId, userId] });
+    await tx.execute({ sql: `DELETE FROM late_purchases WHERE student_id = ? OR coupon_id IN (${mine})`, args: [userId, userId, userId] });
+    await tx.execute({ sql: `DELETE FROM exchange_posts WHERE student_id = ? OR taker_id = ? OR coupon_id IN (${mine})`, args: [userId, userId, userId, userId] });
     await tx.execute({ sql: 'DELETE FROM coupons WHERE student_id = ? OR original_student_id = ?', args: [userId, userId] });
     await tx.execute({ sql: 'DELETE FROM coupon_orders WHERE student_id = ?', args: [userId] });
     await tx.commit();

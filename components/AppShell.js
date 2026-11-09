@@ -5,12 +5,14 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useDispatch } from 'react-redux';
 import {
   Home, UtensilsCrossed, Ticket, Wallet, ScanLine, MessageSquareWarning, MonitorSmartphone,
-  KeyRound, BarChart3, NotebookPen, LayoutDashboard, Users, Clock, LogOut,
+  KeyRound, BarChart3, NotebookPen, LayoutDashboard, Users, Clock, LogOut, Megaphone, ArrowLeftRight,
 } from 'lucide-react';
 import { api, useMeQuery, useLogoutMutation } from '@/store/api';
 import { loggedOut } from '@/store/authSlice';
 import { ROLE_LABEL } from '@/lib/constants';
 import { Logo, Loading } from './ui';
+
+const NOTICES = { href: '/notices', label: 'Notice board', short: 'Notices', icon: Megaphone };
 
 function navFor(user) {
   if (user.role === 'student') {
@@ -21,9 +23,12 @@ function navFor(user) {
     if (user.plan === 'coupon') {
       items.push({ href: '/coupons', label: 'Buy coupons', short: 'Buy', icon: Ticket });
       items.push({ href: '/coupons/wallet', label: 'My coupons', short: 'Wallet', icon: Wallet });
+      // Sidebar only: on phones it is reached from the wallet page, so the bottom bar stays at 6.
+      items.push({ href: '/coupons/exchange', label: 'Coupon exchange', short: 'Exchange', icon: ArrowLeftRight, desktopOnly: true });
     }
     items.push({ href: '/checkin', label: 'Check in', icon: ScanLine });
     items.push({ href: '/complaints', label: 'Complaints', short: 'Issues', icon: MessageSquareWarning });
+    items.push(NOTICES);
     return items;
   }
   if (user.role === 'staff') {
@@ -33,11 +38,13 @@ function navFor(user) {
       { href: '/staff/headcount', label: 'Cook for', icon: BarChart3 },
       { href: '/staff/menu', label: 'Edit menu', short: 'Menu', icon: NotebookPen },
       { href: '/complaints', label: 'Complaints', short: 'Issues', icon: MessageSquareWarning },
+      NOTICES,
     ];
   }
   if (user.role === 'society') {
     return [
       { href: '/society', label: 'Dashboard', icon: LayoutDashboard },
+      NOTICES,
       { href: '/complaints', label: 'Complaints', short: 'Issues', icon: MessageSquareWarning },
       { href: '/menu', label: 'Menus', icon: UtensilsCrossed },
     ];
@@ -45,6 +52,7 @@ function navFor(user) {
   return [
     { href: '/admin/students', label: 'Students', icon: Users },
     { href: '/admin/clock', label: 'Demo clock', short: 'Clock', icon: Clock },
+    NOTICES,
     { href: '/complaints', label: 'Complaints', short: 'Issues', icon: MessageSquareWarning },
     { href: '/menu', label: 'Menus', icon: UtensilsCrossed },
   ];
@@ -89,7 +97,7 @@ export default function AppShell({ children }) {
         <Link href="/" className="brand">
           <Logo />
           <div>
-            <div className="brand-name">Thali</div>
+            <div className="brand-name">CampusBite</div>
             <div className="brand-sub">IIIT Bhubaneswar Mess</div>
           </div>
         </Link>
@@ -116,7 +124,7 @@ export default function AppShell({ children }) {
       <header className="topbar">
         <Link href="/" className="row">
           <Logo size={30} />
-          <span className="brand-name" style={{ fontSize: 17 }}>Thali</span>
+          <span className="brand-name" style={{ fontSize: 17 }}>CampusBite</span>
         </Link>
         <div className="row">
           <span className="small muted">{user.name.split(' ')[0]}</span>
@@ -135,7 +143,7 @@ export default function AppShell({ children }) {
       </main>
 
       <nav className="bottomnav" aria-label="Main">
-        {nav.slice(0, 5).map(({ href, label, short, icon: Icon }) => (
+        {nav.filter((n) => !n.desktopOnly).slice(0, 6).map(({ href, label, short, icon: Icon }) => (
           <Link key={href} href={href} className={isActive(href) ? 'active' : ''}>
             <Icon size={20} />
             {short || label}

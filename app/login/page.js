@@ -48,7 +48,7 @@ export default function LoginPage() {
             <div className="row">
               <Logo size={40} />
               <div>
-                <div className="brand-name">Thali</div>
+                <div className="brand-name">CampusBite</div>
                 <div className="brand-sub">IIIT Bhubaneswar Mess</div>
               </div>
             </div>
@@ -151,7 +151,7 @@ export default function LoginPage() {
             <div className="row" style={{ alignItems: 'flex-start' }}>
               <Logo size={36} />
               <div>
-                <div className="brand-name" style={{ fontSize: 22 }}>Thali</div>
+                <div className="brand-name" style={{ fontSize: 22 }}>CampusBite</div>
                 <div className="meta" style={{ marginTop: 4 }}>Five messes, one app.<br />IIIT Bhubaneswar.</div>
               </div>
             </div>

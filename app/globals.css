@@ -1,4 +1,4 @@
-/* Thali — design tokens and styles.
+/* CampusBite — design tokens and styles.
    Cream paper, deep banana-leaf green panels with torn-paper edges, coral pill buttons,
    turmeric as the second accent, Fraunces for display type. */
 :root {
@@ -447,3 +447,14 @@ table.table { width: 100%; border-collapse: collapse; font-size: 14px; }
   .fade-in { animation-duration: 0.01ms; }
   .katori-loader span { animation: none; }
 }
+
+/* ---- Notice board ---- */
+.notice { border-left: 5px solid var(--line); }
+.notice-special { border-left-color: var(--accent); }
+.notice-veg_only { border-left-color: var(--ok); }
+.notice-change { border-left-color: var(--info); }
+.notice-issue { border-left-color: var(--bad); }
+.notice-general { border-left-color: var(--brand); }
+.notice-past { opacity: 0.7; }
+.notice-title { font-family: var(--display); font-size: 20px; font-weight: 600; color: var(--brand-deep); margin-top: 12px; }
+.notice-body { margin-top: 6px; font-size: 15px; white-space: pre-line; }

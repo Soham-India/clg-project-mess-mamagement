@@ -10,6 +10,7 @@ import { totalOf, shortfallHint, slotKey } from '@/lib/couponRules';
 import { MEALS, DAYS_SHORT } from '@/lib/constants';
 import { PageHeader, Loading, ErrorBox, Badge } from '@/components/ui';
 import WindowBanner from '@/components/WindowBanner';
+import LateBuyCard from '@/components/LateBuyCard';
 
 const dayNum = (date) => Number(date.slice(8));
 const monthShort = (date) => new Date(`${date}T00:00:00Z`).toLocaleDateString('en-IN', { month: 'short', timeZone: 'UTC' });
@@ -34,6 +35,7 @@ export default function CouponPlanner() {
       <>
         <PageHeader title="Buy coupons" sub="Plan the meals you'll eat next week and buy them in one go." />
         <WindowBanner win={win} />
+        <LateBuyCard />
         <div className="card stack" style={{ maxWidth: 560 }}>
           <Badge tone="ok" dot>Already bought for this week</Badge>
           <h2 style={{ fontSize: 22, fontWeight: 800 }}>₹{win.order.total} · {win.order.items.length} coupons</h2>
@@ -59,6 +61,7 @@ export default function CouponPlanner() {
     <>
       <PageHeader title="Buy coupons" sub={`Tick the meals you'll eat. Minimum ₹${win.minTotal} (${win.minDays} days' worth) in any mix.`} />
       <WindowBanner win={win} />
+      <LateBuyCard />
 
       <div className="planner">
         <div className="card">

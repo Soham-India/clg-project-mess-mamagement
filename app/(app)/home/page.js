@@ -1,9 +1,10 @@
 'use client';
 import Link from 'next/link';
-import { Ticket, ScanLine, CheckCircle2, Circle, ArrowRight, MapPin } from 'lucide-react';
-import { useHomeQuery } from '@/store/api';
+import { Ticket, ScanLine, CheckCircle2, Circle, ArrowRight, MapPin, Megaphone } from 'lucide-react';
+import { useHomeQuery, useNoticesQuery, useLateBuyQuery } from '@/store/api';
 import { MEALS } from '@/lib/constants';
 import { Loading, ErrorBox, Countdown, Badge, ThaliPlate } from '@/components/ui';
+import NoticeCard from '@/components/NoticeCard';
 
 const fmtDate = (date) => new Date(`${date}T00:00:00Z`).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', timeZone: 'UTC' });
 
@@ -14,6 +15,8 @@ const greeting = (date) => {
 
 export default function StudentHome() {
   const { data, isLoading, error } = useHomeQuery(undefined, { pollingInterval: 60000 });
+  const { data: noticeData } = useNoticesQuery(undefined, { pollingInterval: 300000 });
+  const { data: late } = useLateBuyQuery(undefined, { skip: !data?.coupons, pollingInterval: 60000 });
   if (isLoading) return <Loading />;
   if (error) return <ErrorBox error={error} />;
 
@@ -46,6 +49,8 @@ export default function StudentHome() {
         )}
       </section>
 
+      <NoticeStrip notices={noticeData?.notices} />
+
       <div className="grid grid-3">
         <div className="card span-2">
           <div className="card-head">
@@ -69,7 +74,14 @@ export default function StudentHome() {
                       {coupon ? (
                         <Badge tone={coupon.status === 'used' ? undefined : 'ok'}>{coupon.status === 'used' ? 'Coupon used' : 'Coupon ready'}</Badge>
                       ) : (
-                        <Badge tone="bad">No coupon</Badge>
+                        <div className="row-wrap" style={{ gap: 6 }}>
+                          <Badge tone="bad">No coupon</Badge>
+                          {late?.options.find((o) => o.meal === m.key && o.state === 'open') && (
+                            <Link href="/coupons#late" className="tiny bold" style={{ color: 'var(--coral)' }}>
+                              Buy for ₹{late.options.find((o) => o.meal === m.key).total}
+                            </Link>
+                          )}
+                        </div>
                       )}
                     </div>
                   )}
@@ -102,7 +114,10 @@ export default function StudentHome() {
             <div className="divider" style={{ margin: '4px 0' }} />
             <div className="row between small"><span className="muted">This week</span><b>{c.week.used} of {c.week.total} used</b></div>
             <div className="progress"><span style={{ width: `${c.week.total ? (c.week.used / c.week.total) * 100 : 0}%` }} /></div>
-            <Link href="/coupons/wallet" className="small bold" style={{ color: 'var(--brand)' }}>Open my coupons</Link>
+            <div className="row between small">
+              <Link href="/coupons/wallet" className="bold" style={{ color: 'var(--brand)' }}>Open my coupons</Link>
+              <Link href="/coupons/exchange" className="bold" style={{ color: 'var(--brand)' }}>Coupon exchange</Link>
+            </div>
           </div>
         ) : (
           <div className="card stack">
@@ -113,5 +128,24 @@ export default function StudentHome() {
         )}
       </div>
     </div>
+  );
+}
+
+// The latest notices (now + coming up), shown under the hero. Hidden when there are none.
+function NoticeStrip({ notices }) {
+  const live = (notices || []).filter((n) => n.state !== 'past');
+  if (!live.length) return null;
+  return (
+    <section className="stack" aria-label="Notices">
+      <div className="row between">
+        <div className="card-title"><Megaphone size={18} /> Notices</div>
+        <Link href="/notices" className="small bold" style={{ color: 'var(--brand)' }}>
+          {live.length > 2 ? `See all ${live.length}` : 'Notice board'}
+        </Link>
+      </div>
+      <div className="grid grid-2">
+        {live.slice(0, 2).map((n) => <NoticeCard key={n.id} n={n} compact />)}
+      </div>
+    </section>
   );
 }

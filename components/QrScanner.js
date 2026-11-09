@@ -3,9 +3,9 @@
 import { useEffect, useRef, useState } from 'react';
 import { Loading } from '@/components/ui';
 
-export const QR_PREFIX = 'THALI-CHECKIN:';
+export const QR_PREFIX = 'CAMPUSBITE-CHECKIN:';
 
-/** Accepts "THALI-CHECKIN:AB12CD" (our QR) or a bare 6-char code. Returns the code or null. */
+/** Accepts "CAMPUSBITE-CHECKIN:AB12CD" (our QR) or a bare 6-char code. Returns the code or null. */
 export function codeFromQr(text) {
   const t = String(text || '').trim().toUpperCase();
   const raw = t.startsWith(QR_PREFIX) ? t.slice(QR_PREFIX.length) : t;
@@ -98,7 +98,7 @@ export default function QrScanner({ onCode }) {
         {status === 'starting' && <div className="scanner-wait"><Loading /></div>}
       </div>
       <p className="small muted" style={{ textAlign: 'center' }}>
-        {wrongQr ? 'That is not a Thali entrance QR. Point at the code on the entrance screen.' : 'Point your camera at the QR on the entrance screen.'}
+        {wrongQr ? 'That is not a CampusBite entrance QR. Point at the code on the entrance screen.' : 'Point your camera at the QR on the entrance screen.'}
       </p>
     </div>
   );

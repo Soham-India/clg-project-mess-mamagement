@@ -1,8 +1,8 @@
 {
-  "name": "thali-iiitbh-mess",
+  "name": "campusbite-iiitbh-mess",
   "version": "1.0.0",
   "private": true,
-  "description": "Thali: IIIT Bhubaneswar Mess Management System (Next.js + Redux + Node.js API routes + SQLite/libSQL)",
+  "description": "CampusBite: IIIT Bhubaneswar Mess Management System (Next.js + Redux + Node.js API routes + SQLite/libSQL)",
   "scripts": {
     "dev": "next dev",
     "build": "next build",

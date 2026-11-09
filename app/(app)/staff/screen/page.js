@@ -56,7 +56,7 @@ export default function EntranceScreen() {
         </div>
 
         <div style={{ textAlign: 'center', padding: '12px 0' }}>
-          <div className="muted bold" style={{ marginBottom: 14 }}>Scan the QR or type the code in Thali to check in</div>
+          <div className="muted bold" style={{ marginBottom: 14 }}>Scan the QR or type the code in CampusBite to check in</div>
           <div className="row" style={{ justifyContent: 'center', gap: 32, flexWrap: 'wrap' }}>
             {qr && (
               <div className="screen-qr">

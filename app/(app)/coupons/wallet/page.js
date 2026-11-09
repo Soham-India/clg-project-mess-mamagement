@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useDispatch } from 'react-redux';
-import { ChevronLeft, ChevronRight, Send, Ticket, ArrowDownLeft, ArrowUpRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Send, Ticket, ArrowDownLeft, ArrowUpRight, Tag, ArrowLeftRight } from 'lucide-react';
 import { useWalletQuery, useTransferCouponMutation, errorText } from '@/store/api';
 import { toastAdded } from '@/store/uiSlice';
 import { mealLabel } from '@/lib/constants';
@@ -25,6 +25,7 @@ export default function WalletPage() {
   return (
     <>
       <PageHeader title="My coupons" sub="Show up and check in; each coupon is used automatically for that meal.">
+        <Link href="/coupons/exchange" className="btn btn-sm"><ArrowLeftRight size={16} /> Coupon exchange</Link>
         <div className="row">
           <button className="btn btn-sm" onClick={() => setWeek(data.prevWeek)} aria-label="Previous week"><ChevronLeft size={16} /></button>
           <span className="bold small" style={{ minWidth: 150, textAlign: 'center' }}>{label} · {fmtDay(data.week)}</span>
@@ -58,10 +59,15 @@ export default function WalletPage() {
                       <div key={c.id} className={`coupon ${c.state}`}>
                         <div>
                           <div className="c-meal">{mealLabel(c.meal)}</div>
-                          <div className="tiny muted">₹{c.price}{c.receivedFrom ? ` · from ${c.receivedFrom}` : ''}</div>
+                          <div className="tiny muted">₹{c.price}{c.lateFee ? ` + ₹${c.lateFee} late` : ''}{c.receivedFrom ? ` · from ${c.receivedFrom}` : ''}</div>
                         </div>
                         <div className="row" style={{ gap: 6 }}>
-                          <Badge tone={STATE[c.state][1]}>{STATE[c.state][0]}</Badge>
+                          {c.onSale ? <Badge tone="warn">On sale</Badge> : <Badge tone={STATE[c.state][1]}>{STATE[c.state][0]}</Badge>}
+                          {c.transferable && !c.onSale && (
+                            <Link href={`/coupons/exchange?sell=${c.id}`} className="btn btn-ghost btn-sm" style={{ padding: '0 8px' }} aria-label={`Sell ${mealLabel(c.meal)} on ${c.date} on the exchange`} title="Sell on the exchange">
+                              <Tag size={15} />
+                            </Link>
+                          )}
                           {c.transferable && (
                             <button className="btn btn-ghost btn-sm" style={{ padding: '0 8px' }} onClick={() => setGiving(c)} aria-label={`Give ${mealLabel(c.meal)} on ${c.date} to a friend`} title="Give to a friend">
                               <Send size={15} />
@@ -80,7 +86,7 @@ export default function WalletPage() {
         <div className="card">
           <div className="card-title" style={{ marginBottom: 12 }}>Transfers</div>
           {data.transfers.length === 0 ? (
-            <p className="small muted">Can&apos;t make a meal? Tap the send icon on a coupon to give it to a friend in your mess. They must not already have that meal.</p>
+            <p className="small muted">Can&apos;t make a meal? Tap the send icon to give a coupon to a friend in your mess, or the tag icon to sell it to anyone in your mess on the <Link href="/coupons/exchange" className="bold" style={{ color: 'var(--brand)' }}>coupon exchange</Link>.</p>
           ) : (
             <div className="stack" style={{ gap: 10 }}>
               {data.transfers.map((t, i) => (
@@ -88,7 +94,7 @@ export default function WalletPage() {
                   {t.direction === 'sent' ? <ArrowUpRight size={16} color="var(--bad)" /> : <ArrowDownLeft size={16} color="var(--ok)" />}
                   <div>
                     <div><b>{t.direction === 'sent' ? `To ${t.to_name}` : `From ${t.from_name}`}</b></div>
-                    <div className="muted tiny">{mealLabel(t.meal)} · {fmtDay(t.date)}</div>
+                    <div className="muted tiny">{mealLabel(t.meal)} · {fmtDay(t.date)}{t.price != null ? ` · ${t.direction === 'sent' ? 'sold' : 'bought'} for ₹${t.price}` : ''}</div>
                   </div>
                 </div>
               ))}

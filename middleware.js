@@ -3,7 +3,7 @@
 import { NextResponse } from 'next/server';
 import { jwtVerify } from 'jose';
 
-const COOKIE = 'thali_session';
+const COOKIE = 'campusbite_session';
 const HOME = { student: '/home', staff: '/staff/screen', society: '/society', admin: '/admin/students' };
 
 // Which roles may open which page prefixes. Pages not listed are open to every logged-in user.

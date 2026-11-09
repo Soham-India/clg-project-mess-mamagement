@@ -1,10 +1,10 @@
-# Thali — IIIT Bhubaneswar Mess Management System
+# CampusBite — IIIT Bhubaneswar Mess Management System
 
 **IWT Project** · Soham Mishra · B423063
 
 **Live app:** _paste your Vercel URL here_ · **Demo password for every account:** `demo1234`
 
-Thali runs the day-to-day work of the IIIT Bhubaneswar messes: weekly menus, weekly coupon purchase for the coupon mess, a rotating-code check-in at the mess entrance, "cook for" headcounts for the contractor, and complaints that the mess society can escalate.
+CampusBite runs the day-to-day work of the IIIT Bhubaneswar messes: weekly menus, weekly coupon purchase for the coupon mess, a rotating-code check-in at the mess entrance, "cook for" headcounts for the contractor, and complaints that the mess society can escalate.
 
 ---
 
@@ -12,11 +12,11 @@ Thali runs the day-to-day work of the IIIT Bhubaneswar messes: weekly menus, wee
 
 | Role | What they can do |
 | --- | --- |
-| **Student — fixed plan** (1st/2nd years, and 3rd/4th years who opted in) | See their own mess and its menu, check in with the entrance code, raise complaints (optionally anonymous), "me too" others' complaints |
-| **Student — coupon plan** (3rd/4th years) | Everything above, plus: plan and buy next week's coupons, see the coupon wallet, give an unused coupon to a friend in the same mess |
-| **Mess staff** (contractor, one account per mess) | Show the rotating code on the entrance screen, check students in by roll number, see how many to cook for, edit their mess's menu, reply to and resolve complaints |
-| **Mess society** | Dashboard of every mess (students, today's attendance, complaints), escalate complaints to the contractor, cook-for check for any mess |
-| **Admin** (hostel office) | Manage students (batch, gender, plan → mess is recomputed), demo clock for showing the time-based rules |
+| **Student — fixed plan** (1st/2nd years, and 3rd/4th years who opted in) | See their own mess and its menu, check in with the entrance code, raise complaints (optionally anonymous), "me too" others' complaints, read the notice board (latest notices also show on Home) |
+| **Student — coupon plan** (3rd/4th years) | Everything above, plus: plan and buy next week's coupons, see the coupon wallet, give an unused coupon to a friend in the same mess, sell spare coupons or ask for a meal on the **coupon exchange**, **late-buy** one of today's meals (+₹10, up to 1 hour before it) |
+| **Mess staff** (contractor, one account per mess) | Show the rotating code on the entrance screen, check students in by roll number, see how many to cook for, edit their mess's menu, reply to and resolve complaints, post notices for their own mess |
+| **Mess society** | Dashboard of every mess (students, today's attendance, complaints), escalate complaints to the contractor, cook-for check for any mess, post notices for one mess or every mess |
+| **Admin** (hostel office) | Manage students (batch, gender, plan → mess is recomputed), demo clock for showing the time-based rules, post notices for one mess or every mess |
 
 ### How the mess works (business rules)
 
@@ -37,15 +37,32 @@ Thali runs the day-to-day work of the IIIT Bhubaneswar messes: weekly menus, wee
 - **Grace period:** purchases still accepted on Monday until dinner starts; Monday meals that have already started are locked.
 - **Weekly minimum:** 4 full days' worth = **₹476**, in any mix of meals. Maximum is 7 full days (₹833).
 - One purchase per student per week. **Unused coupons are not refunded.**
+- **Late buy:** a student without a coupon for one of **today's** meals can still buy that single meal for its price **+ ₹10**, any day of the week, but only until **1 hour before the meal starts** (breakfast by 06:00, lunch by 11:00, dinner by 18:00). It doesn't count as the weekly order and isn't limited by the window or the minimum. The coupon then works like any other coupon (check-in, cook-for counts, transfer, exchange at its normal price). Rules: `lateBuyOptions` / `lateBuyError` in `lib/couponRules.js`.
 - An unused coupon can be **transferred** to another student **in the same mess**, before that meal starts, if they don't already hold that meal.
+
+**Coupon exchange** (`lib/exchange.js`, `app/api/exchange`), for students who don't know who needs a coupon:
+
+- **Sell:** put an unused coupon on sale. Any student of the same mess who doesn't already hold that meal can buy it. Until it sells, the seller can still use it or take it off sale.
+- **Ask:** post "I need Wednesday lunch". Any student of the same mess holding an unused coupon for that meal can sell it to them in one tap. Requests can be up to 7 days ahead, at most 6 open at a time.
+- The price is always the coupon's own price (₹20 / ₹55 / ₹44), so nobody can profit from reselling. Payment is a demo payment.
+- Everything closes when the meal starts. If nobody buys a coupon in time, it expires like any unused coupon (no refund).
+- A trade moves the coupon and closes the post in **one transaction** with conditional updates (`WHERE status = 'unused'`, `WHERE status = 'open'`), so two buyers can't get the same coupon and a coupon used at check-in can't be sold.
 
 **Check-in** (`lib/checkinCode.js`, `lib/checkin.js`):
 
 - The entrance screen shows a 6-character code that **changes every 30 seconds** (an HMAC of a secret, the mess, and the time window), so a code shared on WhatsApp stops working quickly.
 - Each mess has its own code, so the server knows **which mess the student is standing at**.
-- The same code is also shown as a **QR code**. Students tap **Scan QR** on the Check in page and the phone camera reads it and checks them in, with no typing. The QR holds only the rotating code (`THALI-CHECKIN:AB12CD`), so the server runs exactly the same checks. Camera access needs HTTPS (or `localhost`).
+- The same code is also shown as a **QR code**. Students tap **Scan QR** on the Check in page and the phone camera reads it and checks them in, with no typing. The QR holds only the rotating code (`CAMPUSBITE-CHECKIN:AB12CD`), so the server runs exactly the same checks. Camera access needs HTTPS (or `localhost`).
 - Checks, in order: right mess → (coupon plan) has a coupon for this meal → not already served.
 - Results: *Enjoy your meal* · *Wrong mess* · *No coupon for this meal* · *Already served*.
+
+**Notice board** (`app/api/notices`):
+
+- Notices tell students about festival specials (e.g. a Diwali lunch), veg-only days, menu or timing changes, and service issues.
+- Each notice has a type, an optional meal, and a **show from / show until** date range (IST). It appears under *Now*, *Coming up* or *Ended* (ended ones stay visible for 30 days).
+- **Staff** post for their own mess only. The **society** and **admin** post for one mess or for every mess, and can pin important ones. Students only read.
+- Students see notices for their own mess plus the ones for every mess. The two latest also show on their Home page.
+- Staff can delete only their own notices; the society and admin can delete any notice.
 
 ---
 
@@ -127,9 +144,9 @@ The coupon window only opens on weekends, so the admin has a **Demo clock** page
 
 1. **Push to GitHub.** Create an empty repo, then in this folder:
    ```bash
-   git init && git add . && git commit -m "Thali mess management"
+   git init && git add . && git commit -m "CampusBite mess management"
    git branch -M main
-   git remote add origin https://github.com/<you>/thali-mess.git
+   git remote add origin https://github.com/<you>/campusbite-mess.git
    git push -u origin main
    ```
 2. **Create the database on Turso.** Sign up at turso.tech → *Create database* → copy the **database URL** (`libsql://...`) and create an **auth token**.
@@ -162,8 +179,12 @@ All routes are under `/api`. Errors come back as `{ "error": "message" }` with t
 | `GET /menu?unit=` · `PUT /menu` | logged in · staff | Weekly menu · edit own mess's menu |
 | `GET /coupons/window` | coupon student | Window state, week, locked slots, prices, existing order |
 | `POST /coupons/orders` | coupon student | Buy coupons `{ items: [{date, meal}] }` (all rules checked; one DB transaction) |
+| `GET /coupons/late` · `POST /coupons/late` | coupon student | Today's meals for a late buy (price + ₹10, open / held / closed) · buy one `{ meal }` |
 | `GET /coupons/me?week=` | coupon student | Wallet and transfer history |
 | `POST /coupons/:id/transfer` | coupon student | Give a coupon `{ rollNo }` |
+| `GET /exchange` | coupon student | Exchange board of your mess: for sale, wanted, your posts |
+| `POST /exchange` | coupon student | Sell `{ kind: 'sell', couponId }` or ask `{ kind: 'request', date, meal }` |
+| `POST /exchange/:id` · `DELETE /exchange/:id` | coupon student | Take a post (buy the coupon / sell yours to the asker) · cancel your own post |
 | `POST /checkin` | student | Check in with the entrance code `{ code }` |
 | `GET /checkin/code` | staff | Current code, meal, served count, recent check-ins |
 | `POST /checkin/counter` | staff | Check in by roll number |
@@ -171,6 +192,8 @@ All routes are under `/api`. Errors come back as `{ "error": "message" }` with t
 | `GET /complaints` · `POST /complaints` | scoped by role · student | List · raise |
 | `PATCH /complaints/:id` | staff, society, author | Change status with a reply/note |
 | `POST /complaints/:id/metoo` | student | Toggle "me too" |
+| `GET /notices` · `POST /notices` | scoped by role · staff, society, admin | List current, upcoming and recently ended notices · post one `{ title, body, kind, meal, messUnit, startsOn, endsOn, pinned }` |
+| `DELETE /notices/:id` | author staff, society, admin | Delete a notice |
 | `GET /overview` | society, admin | Every mess at a glance |
 | `GET /admin/students` · `PATCH /admin/students/:id` | admin | List · change batch/gender/plan (mess recomputed) |
 | `GET /admin/clock` · `PUT /admin/clock` | admin | Demo clock |
@@ -190,9 +213,12 @@ Defined in `lib/schema.js`; demo data in `lib/seed.js`.
 | `menu_items` | Weekly menu per mess | `(mess_unit, day, meal)` primary key |
 | `coupon_orders` | One purchase per week | `UNIQUE(student_id, week_start)` |
 | `coupons` | One row per meal coupon | `UNIQUE(student_id, date, meal)` |
+| `late_purchases` | Late buys: the coupon, the ₹10 fee and the payment ref | coupon itself is in `coupons` with `order_id` NULL |
 | `transfers` | Coupon transfer history | |
+| `exchange_posts` | Coupon exchange: coupons on sale and requests for a meal | partial `UNIQUE` indexes: a coupon is on sale once; one open request per student per meal |
 | `checkins` | Who ate when | `UNIQUE(student_id, date, meal)` (no double check-in) |
 | `complaints`, `complaint_history`, `complaint_metoo` | Complaints, status timeline, votes | |
+| `notices` | Notice board: special meals, veg-only days, menu/timing changes, service issues | `CHECK(ends_on >= starts_on)`; `mess_unit` NULL = every mess |
 
 **Concurrency-safe updates.** Using a coupon is a single conditional update, so two scans at the same moment can't both succeed:
 
@@ -212,12 +238,12 @@ Buying (order + all its coupons) and transferring (move coupon + log it) each ru
 app/
   login/page.js              landing + login: hero, how it works, demo buttons, meal-time footer
   (app)/layout.js            shared shell (sidebar / bottom nav)
-  (app)/home, menu, coupons, coupons/review, coupons/wallet, checkin, complaints
+  (app)/home, menu, coupons, coupons/review, coupons/wallet, coupons/exchange, checkin, complaints, notices
   (app)/staff/screen, staff/counter, staff/headcount, staff/menu
   (app)/society
   (app)/admin/students, admin/clock
   api/**/route.js            REST API (Node.js)
-components/                  AppShell, UI pieces, WindowBanner, HeadcountView
+components/                  AppShell, UI pieces, WindowBanner, HeadcountView, NoticeCard, LateBuyCard
 lib/
   constants.js               meals, prices, messes, roles
   clock.js                   IST date helpers
@@ -225,6 +251,7 @@ lib/
   messAllocation.js          batch + plan + gender → mess
   checkinCode.js             rotating HMAC code
   checkin.js                 check-in rules and headcount
+  exchange.js                coupon exchange rules and the atomic trade
   auth.js                    JWT cookie, role checks, error handling
   db.js, schema.js, seed.js  database connection, tables, demo data
 store/                       Redux store, slices, RTK Query API
@@ -233,4 +260,4 @@ middleware.js                page access by role
 
 ## 8. Not built yet (next steps)
 
-Mess-society hygiene inspections with scores, notices, meal ratings, skipping a meal in advance, menu approval by the society, an admin price editor, real payment gateway, and charts of attendance over time.
+Mess-society hygiene inspections with scores, meal ratings, skipping a meal in advance, menu approval by the society, an admin price editor, real payment gateway, and charts of attendance over time.

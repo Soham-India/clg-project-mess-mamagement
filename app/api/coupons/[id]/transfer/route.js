@@ -31,9 +31,19 @@ export const POST = handler(async (request, { params }) => {
       args: [to.id, coupon.id, user.id],
     });
     if (res.rowsAffected === 0) throw bad('This coupon is no longer available to transfer.');
+    const at = new Date().toISOString();
     await tx.execute({
       sql: 'INSERT INTO transfers (coupon_id, from_id, to_id, at) VALUES (?,?,?,?)',
-      args: [coupon.id, user.id, to.id, new Date().toISOString()],
+      args: [coupon.id, user.id, to.id, at],
+    });
+    // Given away, so it is no longer on the exchange; and the friend no longer needs to ask for this meal.
+    await tx.execute({
+      sql: "UPDATE exchange_posts SET status = 'cancelled', closed_at = ? WHERE kind = 'sell' AND status = 'open' AND coupon_id = ?",
+      args: [at, coupon.id],
+    });
+    await tx.execute({
+      sql: "UPDATE exchange_posts SET status = 'cancelled', closed_at = ? WHERE kind = 'request' AND status = 'open' AND student_id = ? AND date = ? AND meal = ?",
+      args: [at, to.id, coupon.date, coupon.meal],
     });
     await tx.commit();
   } catch (err) {

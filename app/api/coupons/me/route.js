@@ -22,6 +22,12 @@ export const GET = handler(async (request) => {
       ORDER BY c.date, CASE c.meal WHEN 'breakfast' THEN 1 WHEN 'lunch' THEN 2 ELSE 3 END`,
     [user.id, week, week],
   );
+  const onSale = new Set(
+    (await all("SELECT coupon_id FROM exchange_posts WHERE kind = 'sell' AND status = 'open' AND student_id = ?", [user.id])).map((r) => r.coupon_id),
+  );
+  const lateFees = new Map(
+    (await all('SELECT coupon_id, fee FROM late_purchases WHERE student_id = ?', [user.id])).map((r) => [r.coupon_id, Number(r.fee)]),
+  );
   const coupons = rows.map((c) => {
     let state;
     if (c.status === 'used') state = 'used';
@@ -36,13 +42,16 @@ export const GET = handler(async (request) => {
       usedAt: c.used_at,
       receivedFrom: c.original_student_id !== user.id ? c.from_name : null,
       transferable: state === 'upcoming' && !isSlotStarted(c.date, c.meal, now),
+      onSale: state === 'upcoming' && onSale.has(c.id),
+      lateFee: lateFees.get(c.id) ?? 0,
     };
   });
 
   const transfers = await all(
     `SELECT t.at, c.date, c.meal, f.name AS from_name, f.roll_no AS from_roll, r.name AS to_name, r.roll_no AS to_roll,
-            CASE WHEN t.from_id = ? THEN 'sent' ELSE 'received' END AS direction
+            CASE WHEN t.from_id = ? THEN 'sent' ELSE 'received' END AS direction, e.price
        FROM transfers t JOIN coupons c ON c.id = t.coupon_id
+       LEFT JOIN exchange_posts e ON e.coupon_id = t.coupon_id AND e.closed_at = t.at AND e.status = 'done'
        JOIN users f ON f.id = t.from_id JOIN users r ON r.id = t.to_id
       WHERE t.from_id = ? OR t.to_id = ? ORDER BY t.at DESC LIMIT 20`,
     [user.id, user.id, user.id],

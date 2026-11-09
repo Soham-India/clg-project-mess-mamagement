@@ -2,7 +2,7 @@ import './globals.css';
 import Providers from '@/components/Providers';
 
 export const metadata = {
-  title: 'Thali — IIIT Bhubaneswar Mess',
+  title: 'CampusBite — IIIT Bhubaneswar Mess',
   description: 'Mess management for IIIT Bhubaneswar: menus, weekly coupons, check-in and complaints.',
 };
 

@@ -6,7 +6,7 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 export const api = createApi({
   reducerPath: 'api',
   baseQuery: fetchBaseQuery({ baseUrl: '/api', credentials: 'same-origin' }),
-  tagTypes: ['Me', 'Home', 'Menu', 'Window', 'Wallet', 'Checkin', 'Headcount', 'Complaints', 'Students', 'Clock', 'Overview'],
+  tagTypes: ['Me', 'Home', 'Menu', 'Window', 'Wallet', 'Checkin', 'Headcount', 'Complaints', 'Students', 'Clock', 'Overview', 'Notices', 'Exchange', 'Late'],
   endpoints: (b) => ({
     // Auth
     me: b.query({ query: () => '/auth/me', providesTags: ['Me'] }),
@@ -19,16 +19,36 @@ export const api = createApi({
     couponWindow: b.query({ query: () => '/coupons/window', providesTags: ['Window'] }),
     placeOrder: b.mutation({
       query: (items) => ({ url: '/coupons/orders', method: 'POST', body: { items } }),
-      invalidatesTags: ['Window', 'Wallet', 'Home'],
+      invalidatesTags: ['Window', 'Wallet', 'Home', 'Exchange', 'Late'],
+    }),
+    // Late buy: one of today's meals at price + late fee, until 1 hour before it
+    lateBuy: b.query({ query: () => '/coupons/late', providesTags: ['Late'] }),
+    buyLate: b.mutation({
+      query: (body) => ({ url: '/coupons/late', method: 'POST', body }),
+      invalidatesTags: ['Late', 'Wallet', 'Home', 'Exchange'],
     }),
     wallet: b.query({ query: (week) => (week ? `/coupons/me?week=${week}` : '/coupons/me'), providesTags: ['Wallet'] }),
     transferCoupon: b.mutation({
       query: ({ id, rollNo }) => ({ url: `/coupons/${id}/transfer`, method: 'POST', body: { rollNo } }),
-      invalidatesTags: ['Wallet', 'Home'],
+      invalidatesTags: ['Wallet', 'Home', 'Exchange', 'Late'],
+    }),
+    // Coupon exchange (same mess, at the coupon's price)
+    exchange: b.query({ query: () => '/exchange', providesTags: ['Exchange'] }),
+    createExchangePost: b.mutation({
+      query: (body) => ({ url: '/exchange', method: 'POST', body }),
+      invalidatesTags: ['Exchange', 'Wallet'],
+    }),
+    takeExchangePost: b.mutation({
+      query: (id) => ({ url: `/exchange/${id}`, method: 'POST' }),
+      invalidatesTags: ['Exchange', 'Wallet', 'Home', 'Late'],
+    }),
+    cancelExchangePost: b.mutation({
+      query: (id) => ({ url: `/exchange/${id}`, method: 'DELETE' }),
+      invalidatesTags: ['Exchange', 'Wallet'],
     }),
     checkin: b.mutation({
       query: (code) => ({ url: '/checkin', method: 'POST', body: { code } }),
-      invalidatesTags: ['Home', 'Wallet'],
+      invalidatesTags: ['Home', 'Wallet', 'Exchange'],
     }),
 
     // Staff
@@ -58,6 +78,17 @@ export const api = createApi({
       invalidatesTags: ['Complaints'],
     }),
 
+    // Notice board
+    notices: b.query({ query: () => '/notices', providesTags: ['Notices'] }),
+    createNotice: b.mutation({
+      query: (body) => ({ url: '/notices', method: 'POST', body }),
+      invalidatesTags: ['Notices'],
+    }),
+    deleteNotice: b.mutation({
+      query: (id) => ({ url: `/notices/${id}`, method: 'DELETE' }),
+      invalidatesTags: ['Notices'],
+    }),
+
     // Society / admin
     overview: b.query({ query: () => '/overview', providesTags: ['Overview'] }),
     students: b.query({ query: () => '/admin/students', providesTags: ['Students'] }),
@@ -69,7 +100,7 @@ export const api = createApi({
     setClock: b.mutation({
       query: (body) => ({ url: '/admin/clock', method: 'PUT', body }),
       // Moving the clock changes nearly everything, so refetch it all.
-      invalidatesTags: ['Clock', 'Me', 'Home', 'Window', 'Wallet', 'Checkin', 'Headcount', 'Overview', 'Menu'],
+      invalidatesTags: ['Clock', 'Me', 'Home', 'Window', 'Wallet', 'Checkin', 'Headcount', 'Overview', 'Menu', 'Notices', 'Exchange', 'Late'],
     }),
   }),
 });
@@ -77,9 +108,11 @@ export const api = createApi({
 export const {
   useMeQuery, useLoginMutation, useLogoutMutation,
   useHomeQuery, useMenuQuery, useCouponWindowQuery, usePlaceOrderMutation, useWalletQuery,
-  useTransferCouponMutation, useCheckinMutation,
+  useTransferCouponMutation, useCheckinMutation, useLateBuyQuery, useBuyLateMutation,
+  useExchangeQuery, useCreateExchangePostMutation, useTakeExchangePostMutation, useCancelExchangePostMutation,
   useCheckinCodeQuery, useCounterCheckinMutation, useHeadcountQuery, useUpdateMenuMutation,
   useComplaintsQuery, useCreateComplaintMutation, useUpdateComplaintMutation, useMetooMutation,
+  useNoticesQuery, useCreateNoticeMutation, useDeleteNoticeMutation,
   useOverviewQuery, useStudentsQuery, useUpdateStudentMutation, useClockQuery, useSetClockMutation,
 } = api;
 
