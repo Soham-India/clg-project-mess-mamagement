@@ -1,0 +1,28 @@
+{
+  "name": "thali-iiitbh-mess",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Thali: IIIT Bhubaneswar Mess Management System (Next.js + Redux + Node.js API routes + SQLite/libSQL)",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "db:reset": "node scripts/reset-db.js"
+  },
+  "dependencies": {
+    "@libsql/client": "0.18.0",
+    "@reduxjs/toolkit": "2.14.0",
+    "bcryptjs": "^2.4.3",
+    "jose": "^5.9.6",
+    "jsqr": "^1.4.0",
+    "lucide-react": "^0.460.0",
+    "next": "15.5.29",
+    "qrcode": "^1.5.4",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "react-redux": "^9.1.2"
+  },
+  "engines": {
+    "node": ">=18.18"
+  }
+}
