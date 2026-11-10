@@ -56,9 +56,9 @@ export const statusTone = (s) => STATUS_TONE[s];
 export function useServerNow(serverNow) {
   const base = useRef({ server: serverNow, local: Date.now() });
   const [, force] = useState(0);
-  useEffect(() => {
-    base.current = { server: serverNow, local: Date.now() };
-  }, [serverNow]);
+  // Re-sync straight away when the server time changes (e.g. data just loaded),
+  // so the very first render never mixes an old/undefined value with a new one.
+  if (base.current.server !== serverNow) base.current = { server: serverNow, local: Date.now() };
   useEffect(() => {
     const t = setInterval(() => force((x) => x + 1), 1000);
     return () => clearInterval(t);
